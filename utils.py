@@ -108,24 +108,24 @@ def extract_keywords(df, topics, google_word2vec, topics_vs_keywords):
                 topics_vs_keywords["financial"].add(word)
                 continue
 
-        for topic in topics:
-            topic = topic.lower()
-            stemmed_word = ps.stem(word)
+            for topic in topics:
+                topic = topic.lower()
+                stemmed_word = ps.stem(word)
 
-            ## calculate similarity between topic and keyword using google_word2vec
-            if topic in google_word2vec and word in google_word2vec:
-                word_similarity = google_word2vec.similarity(topic,word)
-            else:
-                word_similarity = 0.0
-            
-            ## calculate similarity between topic and stemmed keyword using google_word2vec
-            if topic in google_word2vec and stemmed_word in google_word2vec:
-                stemmed_word_similarity = google_word2vec.similarity(topic,stemmed_word)
-            else:
-                stemmed_word_similarity = 0.0
+                ## calculate similarity between topic and keyword using google_word2vec
+                if topic in google_word2vec and word in google_word2vec:
+                    word_similarity = google_word2vec.similarity(topic,word)
+                else:
+                    word_similarity = 0.0
+                
+                ## calculate similarity between topic and stemmed keyword using google_word2vec
+                if topic in google_word2vec and stemmed_word in google_word2vec:
+                    stemmed_word_similarity = google_word2vec.similarity(topic,stemmed_word)
+                else:
+                    stemmed_word_similarity = 0.0
 
-            if (stemmed_word_similarity>=0.65 or word_similarity>=0.65):
-                topics_vs_keywords[topic].add(word)
+                if (stemmed_word_similarity>=0.65 or word_similarity>=0.65):
+                    topics_vs_keywords[topic].add(word)
     
     return topics_vs_keywords
 
