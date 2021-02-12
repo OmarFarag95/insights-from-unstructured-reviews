@@ -80,21 +80,24 @@ def get_synoyoms(word):
     Generate Synonyms for a given word
     """
 
-    synonyms = [word]
+    try:
+        synonyms = [word]
   
-    synsets = wordnet.synsets(word)
+        synsets = wordnet.synsets(word)
 
-    # generate synonyms using wordnet corpus
-    for syn in synsets: 
-        for word in syn.lemmas(): 
-            synonyms.append(" ".join(word.name().lower().split("_")))
+        # generate synonyms using wordnet corpus
+        for syn in synsets: 
+            for word in syn.lemmas(): 
+                synonyms.append(" ".join(word.name().lower().split("_")))
 
-        for word in syn.hypernyms():
-            tokens = word.name().split('.')
-            synonyms.append(re.sub(r"[^a-z]",""," ".join(tokens[0].lower().split("_"))))
+            for word in syn.hypernyms():
+                tokens = word.name().split('.')
+                synonyms.append(re.sub(r"[^a-z]",""," ".join(tokens[0].lower().split("_"))))
 
-    # use only the first six synonyms
-    synonyms=synonyms[:6]
+        # use only the first six synonyms
+        synonyms=synonyms[:6]
+    except:
+        pass
 
     # generate synonyms using google word2vec model
     if word in google_word2vec:
