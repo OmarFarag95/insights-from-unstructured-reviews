@@ -85,7 +85,7 @@ def get_synoyoms(word):
     if word in google_word2vec:
       similar_words = google_word2vec.most_similar(word)
       for word,score in similar_words:
-        if score>=0.8:
+        if score>=0.6:
           synonyms.append(re.sub(r"[^a-z]","",preprocess_text(" ".join(word.lower().split("_")))))
 
     return list(set(synonyms))
@@ -145,14 +145,14 @@ def extract_topics(review, keywords, topics, keywords_vs_topics):
         for token in tokens:
             token = " ".join(token)
 
-        if token in keywords:
-            tags = keywords_vs_topics.get(token)
+            if token in keywords:
+                tags = keywords_vs_topics.get(token)
 
-            for tag in tags:
-                extracted_topics[tag] = extracted_topics.get(tag,0)+1
-                #print(tag,'--->',token)
-                topics_vs_sentence_index[idx] = topics_vs_sentence_index.get(idx,[])
-                topics_vs_sentence_index[idx].append(tag)
+                for tag in tags:
+                    extracted_topics[tag] = extracted_topics.get(tag,0)+1
+                    #print(tag,'--->',token)
+                    topics_vs_sentence_index[idx] = topics_vs_sentence_index.get(idx,[])
+                    topics_vs_sentence_index[idx].append(tag)
           
     return list(extracted_topics.keys()), topics_vs_sentence_index
 
