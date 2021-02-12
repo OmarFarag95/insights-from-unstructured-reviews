@@ -104,7 +104,7 @@ def get_synoyoms(word):
     return list(set(synonyms))
 
 
-def extract_keywords(df, topics, google_word2vec, topics_vs_keywords):
+def extract_keywords(df, topics, topics_vs_keywords):
     """
     Extract keywords from reviews that are semantically similar to the topic names
     """
