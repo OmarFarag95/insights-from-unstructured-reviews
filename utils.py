@@ -5,6 +5,16 @@ from wordcloud import STOPWORDS
 import nltk
 from nltk.stem import PorterStemmer
 from google_trans_new import google_translator
+from gensim.models import KeyedVectors
+import flair
+
+
+
+## Initialize Word2Vec model
+google_word2vec = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin' ,binary=True)
+
+## Initialize flair text classification model
+flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
 
 translator = google_translator()
 stopwords = list(STOPWORDS)
@@ -63,7 +73,7 @@ def preprocess_text(comment, remove_stopwords = True):
     
     return ''
 
-def get_synoyoms(word, google_word2vec):
+def get_synoyoms(word):
     """
     Generate Synonyms for a given word
     """
@@ -101,7 +111,6 @@ def extract_keywords(df, topics, google_word2vec, topics_vs_keywords):
 
     for line in df["clean_review"].values:
         text = line.split()
-    
         for word in text:
             ##
             if '$' in word:
@@ -159,3 +168,32 @@ def extract_topics(review, keywords, topics, keywords_vs_topics):
                 topics_vs_sentence_index[idx].append(tag)
           
     return list(extracted_topics.keys()), topics_vs_sentence_index
+
+def get_keywords_vs_topics(topics_vs_keywords):
+
+    keywords_vs_topics = dict()
+    topics_vs_keywords_expanded = dict()
+    for key ,values in topics_vs_keywords.items():
+        for v in values:
+            synonyms = get_synoyoms(v)
+            for w in synonyms:
+            
+                topics_vs_keywords_expanded[w] = topics_vs_keywords_expanded.get(w,set())
+                topics_vs_keywords_expanded[w].add(key)
+
+                keywords_vs_topics[key] = keywords_vs_topics.get(key,set())
+                keywords_vs_topics[key].add(w)
+    
+    return keywords_vs_topics, topics_vs_keywords_expanded
+
+def predict_sentiment(document):
+    
+    sent_obj = flair.data.Sentence(document)
+    flair_sentiment.predict(sent_obj)
+  
+    if sent_obj.labels:
+        sentiment = str(sent_obj.labels[0])
+        sentiment = re.sub(r"\((.*?)\)","",sentiment).strip()
+        return sentiment.lower()
+  
+    return ''
