@@ -3,6 +3,8 @@ from langdetect import detect
 from nltk.corpus import wordnet
 from wordcloud import STOPWORDS
 import nltk
+nltk.download('wordnet')
+nltk.download('punkt')
 from nltk.stem import PorterStemmer
 from google_trans_new import google_translator
 from gensim.models import KeyedVectors
@@ -87,9 +89,9 @@ def get_synoyoms(word):
         for word in syn.lemmas(): 
             synonyms.append(" ".join(word.name().lower().split("_")))
 
-    for word in syn.hypernyms():
-        tokens = word.name().split('.')
-        synonyms.append(re.sub(r"[^a-z]",""," ".join(tokens[0].lower().split("_"))))
+        for word in syn.hypernyms():
+            tokens = word.name().split('.')
+            synonyms.append(re.sub(r"[^a-z]",""," ".join(tokens[0].lower().split("_"))))
 
     # use only the first six synonyms
     synonyms=synonyms[:6]
