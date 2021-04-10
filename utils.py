@@ -53,9 +53,7 @@ def detect_language_and_translate(text):
         return translate_text
 
     except:
-        return ''
-  
-    return text
+        return text
 
 def preprocess_text(comment, remove_stopwords = True):
     """
