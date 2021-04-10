@@ -10,6 +10,9 @@ from nltk.stem import PorterStemmer
 from google_trans_new import google_translator
 from gensim.models import KeyedVectors
 import flair
+from collections import Counter
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 ## Initialize Word2Vec model
@@ -210,3 +213,63 @@ def predict_sentiment(document):
             return sentiment.lower()
 
     return ""
+
+
+def get_counts(df, topics):
+
+    property_names = df["PROPERTY NAME"].unique()
+    property_vs_sentimentfreqs = {
+        p: {"positive": 0, "negative": 0} for p in property_names
+    }
+    property_vs_categoriesfreqs = {p: {} for p in property_names}
+
+    for p in sorted(property_names):
+
+        property_vs_sentimentfreqs[p]["positive"] = dict(
+            df[df["PROPERTY NAME"] == p].groupby(["sentiment"]).size()
+        ).get("positive", 0)
+        property_vs_sentimentfreqs[p]["negative"] = dict(
+            df[df["PROPERTY NAME"] == p].groupby(["sentiment"]).size()
+        ).get("negative", 0)
+
+        list_of_values = list(df[df["PROPERTY NAME"] == p]["topics"].values)
+
+        flat_list = [item for sublist in list_of_values for item in sublist]
+
+        topics_count = dict(Counter(flat_list))
+
+        curr_topics = {}
+        for topic in topics:
+            curr_topics[topic] = topics_count.get(topic.lower(), 0)
+
+        property_vs_categoriesfreqs[p] = curr_topics
+
+    return property_vs_sentimentfreqs, property_vs_categoriesfreqs
+
+
+def plot_location_vs_topics_count(df, loc_name):
+
+    fig, axs = plt.subplots(2, 1, figsize=(12, 10))
+
+    values = df.loc[loc_name].drop(["positive", "negative"]).values
+
+    categories = list(df.loc[loc_name].drop(["positive", "negative"]).index)
+
+    title = f"topics frequency in {loc_name} comments"
+    sns.barplot(values, categories, ax=axs[0])
+
+    axs[0].set_xticks(range(0, values.max() + 1))
+    axs[0].set_title(f"frequent topics in {loc_name}'s reviews")
+
+    values = df.loc[loc_name][["positive", "negative"]].values
+    categories = list(df.loc[loc_name][["positive", "negative"]].index)
+
+    title = f"topics frequency in {loc_name} comments"
+    sns.barplot(values, categories, ax=axs[1])
+    axs[1].set_xticks(range(0, values.max() + 1))
+    axs[1].set_title(f"People reaction in {loc_name}'s reviews")
+
+    loc_name = loc_name.replace("/", "")
+    # plt.savefig(f"graphs/{loc_name}.png")
+
+    # return fig
